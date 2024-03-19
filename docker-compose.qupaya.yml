@@ -1,0 +1,71 @@
+version: "2.4"
+
+services:
+  postgres:
+    ## Documentation for this image and available settings can be found on hub.docker.com
+    ## https://hub.docker.com/_/postgres
+    ## Please keep in mind this will create a superuser and it's recommended to use a less privileged
+    ## user to connect to the database.
+    ## A guide on how to change the database user to a nonsuperuser can be found in docs/creation-of-nonsuperuser.md
+    image: postgres:13-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    volumes:
+      - ./volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
+    environment:
+      - 'TZ="Europe/Berlin"'
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+  mattermost:
+    depends_on:
+      - postgres
+    ## 'mattermost-enterprise-edition' or 'mattermost-team-edition' based on the version of Mattermost you're installing.
+    image: mattermost/mattermost-enterprise-edition:8.1.9
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    ## Make Mattermost container readonly. This interferes with the regeneration of root.html inside the container. Only use
+    ## it if you know what you're doing.
+    ## See https://github.com/mattermost/docker/issues/18
+    read_only: false
+    tmpfs:
+      - /tmp
+    volumes:
+      ## Inside the container the uid and gid is 2000. The folder owner can be set with
+      ## `sudo chown -R 2000:2000 ./volumes/app/mattermost`.
+      - ./volumes/app/mattermost/config:/mattermost/config:rw
+      - ./volumes/app/mattermost/data:/mattermost/data:rw
+      - ./volumes/app/mattermost/logs:/mattermost/logs:rw
+      - ./volumes/app/mattermost/plugins:/mattermost/plugins:rw
+      - ./volumes/app/mattermost/client/plugins:/mattermost/client/plugins:rw
+      - ./volumes/app/mattermost/bleve-indexes:/mattermost/bleve-indexes:rw
+    environment:
+      - 'TZ="Europe/Berlin"'
+      ## Configuration settings for Mattermost. Documentation on the variables and the settings itself can be found at
+      ## https://docs.mattermost.com/administration/config-settings.html
+      ## Keep in mind that variables set here will take precedence over the same setting in config.json. This includes
+      ## the system console as well and settings set with env variables will be greyed out.
+      - 'MM_SQLSETTINGS_DRIVERNAME="postgres"'
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - 'MM_SQLSETTINGS_DATASOURCE="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable&connect_timeout=10"'
+      ## Bleve index (inside the container)
+      - 'MM_BLEVESETTINGS_INDEXDIR="/mattermost/bleve-indexes"'
+      - DOMAIN
+      - 'MM_SERVICESETTINGS_SITEURL="https://${DOMAIN}"'
+    ports:
+      ## The app port is only relevant for using Mattermost without the nginx container as reverse proxy. This is not meant
+      ## to be used with the internal HTTP server exposed but rather in case one wants to host several services on one host
+      ## or for using it behind another existing reverse proxy.
+      - 8065:8065
+      - 8443:8443/udp
+      - 8443:8443/tcp
