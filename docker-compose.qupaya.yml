@@ -57,11 +57,11 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-      - 'MM_SQLSETTINGS_DATASOURCE="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable&connect_timeout=10"'
+      - "MM_SQLSETTINGS_DATASOURCE=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable&connect_timeout=10"
       ## Bleve index (inside the container)
-      - 'MM_BLEVESETTINGS_INDEXDIR="/mattermost/bleve-indexes"'
+      - "MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes"
       - DOMAIN
-      - 'MM_SERVICESETTINGS_SITEURL="https://${DOMAIN}"'
+      - "MM_SERVICESETTINGS_SITEURL=https://${DOMAIN}"
     ports:
       ## The app port is only relevant for using Mattermost without the nginx container as reverse proxy. This is not meant
       ## to be used with the internal HTTP server exposed but rather in case one wants to host several services on one host
