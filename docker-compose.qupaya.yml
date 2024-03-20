@@ -27,7 +27,7 @@ services:
     depends_on:
       - postgres
     ## 'mattermost-enterprise-edition' or 'mattermost-team-edition' based on the version of Mattermost you're installing.
-    image: mattermost/mattermost-enterprise-edition:8.1.9
+    image: mattermost/mattermost-enterprise-edition:9.6.0
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
