@@ -7,7 +7,7 @@ services:
     ## Please keep in mind this will create a superuser and it's recommended to use a less privileged
     ## user to connect to the database.
     ## A guide on how to change the database user to a nonsuperuser can be found in docs/creation-of-nonsuperuser.md
-    image: postgres:13-alpine
+    image: postgres:16.2-alpine3.19
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
