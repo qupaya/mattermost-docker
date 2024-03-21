@@ -19,7 +19,7 @@ services:
     volumes:
       - ./volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
     environment:
-      - 'TZ="Europe/Berlin"'
+      - "TZ=Europe/Berlin"
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
@@ -53,7 +53,7 @@ services:
       ## https://docs.mattermost.com/administration/config-settings.html
       ## Keep in mind that variables set here will take precedence over the same setting in config.json. This includes
       ## the system console as well and settings set with env variables will be greyed out.
-      - MM_SQLSETTINGS_DRIVERNAME
+      - "MM_SQLSETTINGS_DRIVERNAME=postgres"
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
